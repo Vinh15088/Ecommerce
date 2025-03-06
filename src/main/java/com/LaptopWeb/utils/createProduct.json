@@ -1,0 +1,19 @@
+{
+  "name": "Laptop3",
+  "sku": "LAP3",
+  "shortDescription": "A powerful laptop with high-end specifications.",
+  "longDescription": "This laptop features a high-resolution display, fast processor, and long battery life. Perfect for gaming and professional work.",
+  "stock": 50,
+  "cost": 14000000,
+  "price": 18500000,
+  "discount": 20.0,
+  "active": true,
+  "productDetails": {
+    "processor": "Intel Core i0",
+    "ram": "32GB",
+    "storage": "512GB SSD",
+    "graphics": "NVIDIA GTX 4060"
+  },
+  "category_id": 5,
+  "brand_id": 11
+}

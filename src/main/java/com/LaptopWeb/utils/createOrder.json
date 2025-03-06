@@ -1,0 +1,21 @@
+{
+  "address": "123 Main Street, City Name",
+  "phone": "123-456-7890",
+  "note": "Please deliver between 9 AM and 11 AM",
+  "paymentType": "CREDIT_CARD",
+  "detailRequests": [
+    {
+      "unitPrice": 250,
+      "quantity": 3,
+      "totalPrice": 750,
+      "productId": 2
+    },
+    {
+      "unitPrice": 100,
+      "quantity": 3,
+      "totalPrice": 300,
+      "productId": 1
+    }
+  ],
+  "totalPrice": 1050
+}

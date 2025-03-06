@@ -8,10 +8,7 @@ import com.LaptopWeb.exception.AppException;
 import com.LaptopWeb.exception.ErrorApp;
 import com.LaptopWeb.mapper.ReviewMapper;
 import com.LaptopWeb.repository.ReviewRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -19,19 +16,13 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ReviewService {
 
-    @Autowired
-    private ReviewRepository reviewRepository;
-
-    @Autowired
-    private ReviewMapper reviewMapper;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private ProductService productService;
+    private final ReviewRepository reviewRepository;
+    private final ReviewMapper reviewMapper;
+    private final UserService userService;
+    private final ProductService productService;
 
     @PreAuthorize("hasRole('USER')")
     public Review createReview(String username, ReviewRequest request) {

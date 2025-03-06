@@ -7,10 +7,9 @@ import com.LaptopWeb.exception.AppException;
 import com.LaptopWeb.exception.ErrorApp;
 import com.LaptopWeb.mapper.OrderDetailMapper;
 import com.LaptopWeb.mapper.OrderMapper;
-import com.LaptopWeb.repository.OrderDetailRepository;
 import com.LaptopWeb.repository.OrderRepository;
 import com.LaptopWeb.repository.OrderStatusRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,33 +25,17 @@ import java.util.TimeZone;
 
 @Service
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class OrderService {
-    @Autowired
-    private OrderRepository orderRepository;
 
-    @Autowired
-    private ProductService productService;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private OrderDetailMapper orderDetailMapper;
-
-    @Autowired
-    private OrderMapper orderMapper;
-
-    @Autowired
-    private OrderStatusRepository orderStatusRepository;
-
-    @Autowired
-    private OrderDetailRepository orderDetailRepository;
-
-    @Autowired
-    private EmailService emailService;
-
-    @Autowired
-    private CartService cartService;
+    private final OrderRepository orderRepository;
+    private final ProductService productService;
+    private final UserService userService;
+    private final OrderDetailMapper orderDetailMapper;
+    private final OrderMapper orderMapper;
+    private final OrderStatusRepository orderStatusRepository;
+    private final EmailService emailService;
+    private final CartService cartService;
 
     private void sendOrderConfirmationEmail(Order order) {
         EmailDetails emailDetails = new EmailDetails();
@@ -77,7 +60,7 @@ public class OrderService {
         }
 
         String msgBody = String.format(
-                "Xin chào %s,\n\n"
+                "Xin chào %s, \n\n"
                         + "Cảm ơn bạn đã đặt hàng tại cửa hàng của chúng tôi!\n\n"
                         + "Thông tin đơn hàng của bạn:\n"
                         + "Mã đơn hàng: %s\n"
@@ -124,8 +107,8 @@ public class OrderService {
                     OrderDetail orderDetail = orderDetailMapper.toOrderDetail(detailRequest);
                     orderDetail.setOrder(order);
                     orderDetail.setProduct(product);
-                    orderDetail.setUnitPrice(Math.toIntExact(product.getCost()));
-                    orderDetail.setTotalPrice((int) (product.getCost() * detailRequest.getQuantity()));
+                    orderDetail.setUnitPrice(Math.toIntExact(product.getPrice()));
+                    orderDetail.setTotalPrice((int) (product.getPrice() * detailRequest.getQuantity()));
 
                     int quantity = -detailRequest.getQuantity();
 

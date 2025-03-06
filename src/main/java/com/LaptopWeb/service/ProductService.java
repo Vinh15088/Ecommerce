@@ -10,11 +10,10 @@ import com.LaptopWeb.exception.ErrorApp;
 import com.LaptopWeb.mapper.ProductMapper;
 import com.LaptopWeb.repository.ProductImageRepository;
 import com.LaptopWeb.repository.ProductRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,25 +21,15 @@ import java.util.*;
 
 @Service
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class ProductService {
 
-    @Autowired
-    private ProductRepository productRepository;
-
-    @Autowired
-    private ProductMapper productMapper;
-
-    @Autowired
-    private AwsS3Service awsS3Service;
-
-    @Autowired
-    private CategoryService categoryService;
-
-    @Autowired
-    private BrandService brandService;
-
-    @Autowired
-    private ProductImageRepository productImageRepository;
+    private final ProductRepository productRepository;
+    private final ProductMapper productMapper;
+    private final AwsS3Service awsS3Service;
+    private final CategoryService categoryService;
+    private final BrandService brandService;
+    private final ProductImageRepository productImageRepository;
 
 
     @PreAuthorize("hasRole('ADMIN')")

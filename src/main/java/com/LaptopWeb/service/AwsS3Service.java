@@ -1,27 +1,20 @@
 package com.LaptopWeb.service;
 
-import com.LaptopWeb.exception.AppException;
-import com.LaptopWeb.exception.ErrorApp;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 
 @Service
+@RequiredArgsConstructor
 public class AwsS3Service {
 
     private final String BUCKET_NAME = "ecommerce-vinhseo";
 
-    @Autowired
-    private AmazonS3 amazonS3;
+    private final AmazonS3 amazonS3;
 
     // save imgage to s3
     public String saveImageToS3(MultipartFile photo, String folder) throws Exception {

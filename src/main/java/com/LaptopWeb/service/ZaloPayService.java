@@ -1,6 +1,5 @@
 package com.LaptopWeb.service;
 
-import com.LaptopWeb.config.ZaloPayConfig;
 import com.LaptopWeb.dto.request.ZaloPayCallbackRequest;
 import com.LaptopWeb.dto.response.ZaloPayResponse;
 import com.LaptopWeb.entity.Order;
@@ -10,6 +9,7 @@ import com.LaptopWeb.exception.ErrorApp;
 import com.LaptopWeb.utils.HMACUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.xml.bind.DatatypeConverter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
@@ -21,7 +21,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Mac;
@@ -37,9 +37,22 @@ import java.util.*;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ZaloPayService {
-    @Autowired
-    private OrderService orderService;
+
+    private final OrderService orderService;
+
+    @Value("${zalo-pay.app_id}")
+    private String app_id;
+
+    @Value("${zalo-pay.key1}")
+    private String key1;
+
+    @Value("${zalo-pay.key2}")
+    private String key2;
+
+    @Value("${zalo-pay.endpoint}")
+    private String endpoint;
 
     private String getCurrentTimeString(String format) {
 
@@ -49,12 +62,22 @@ public class ZaloPayService {
         return fmt.format(cal.getTimeInMillis());
     }
 
+    public static String getRandomNumber(int len) {
+        Random rnd = new Random();
+        String chars = "0123456789";
+        StringBuilder sb = new StringBuilder(len);
+        for (int i = 0; i < len; i++) {
+            sb.append(chars.charAt(rnd.nextInt(chars.length())));
+        }
+        return sb.toString();
+    }
+
     public ZaloPayResponse createPaymentByZaloPay(String orderCode, String username) throws IOException {
         Order order = orderService.getOrderByOrderCode(orderCode);
 
         if(order.isPaymentStatus()) throw new AppException(ErrorApp.PAID_ORDER);
 
-        String app_trans_id = getCurrentTimeString("yyMMdd") + "_" + ZaloPayConfig.getRandomNumber(10);
+        String app_trans_id = getCurrentTimeString("yyMMdd") + "_" + getRandomNumber(10);
 
         orderService.saveTransactionIdAndPaymentType(orderCode, app_trans_id, PaymentMethod.ZALOPAY.getName());
 
@@ -72,14 +95,14 @@ public class ZaloPayService {
 
         JSONObject embed_data = new JSONObject();
         embed_data.put("preferred_payment_method", new ArrayList<>());
-        embed_data.put("redirecturl", "https://youtube.com"); // url return after payment
+        embed_data.put("redirecturl", "http://localhost:3000/my-orders/pending"); // url return after payment
 
-        String callbackUrl = "https://47cb-2405-4803-fe81-6de0-586a-ff38-f3fd-8ec0.ngrok-free.app/api/v1"
+        String callbackUrl = "https://9d7a-2405-4803-fe88-65c0-b146-e72f-4d18-761b.ngrok-free.app/api/v1"
                 + "/payment/zalo-pay/call-back";
 
 
         Map<String, Object> orderNew = new HashMap<>() {{
-            put("app_id", ZaloPayConfig.app_id);
+            put("app_id", app_id);
             put("app_user", username);
             put("app_trans_id", app_trans_id);
             put("app_time", System.currentTimeMillis());
@@ -98,10 +121,10 @@ public class ZaloPayService {
         String data = orderNew.get("app_id") +"|"+ orderNew.get("app_trans_id") +"|"+
                 orderNew.get("app_user") +"|"+ orderNew.get("amount") +"|"+
                 orderNew.get("app_time") +"|"+ orderNew.get("embed_data") +"|"+ orderNew.get("item");
-        orderNew.put("mac", HMACUtil.HMacHexStringEncode(HMACUtil.HMACSHA256, ZaloPayConfig.key1, data));
+        orderNew.put("mac", HMACUtil.HMacHexStringEncode(HMACUtil.HMACSHA256, key1, data));
 
         CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost post = new HttpPost(ZaloPayConfig.endpoint + "/create");
+        HttpPost post = new HttpPost(endpoint + "/create");
 
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         for(Map.Entry<String, Object> entry : orderNew.entrySet()) {
@@ -131,7 +154,7 @@ public class ZaloPayService {
         JSONObject jsonObject = new JSONObject();
 
         Mac HmacSHA256 = Mac.getInstance("HmacSHA256");
-        HmacSHA256.init(new SecretKeySpec(ZaloPayConfig.key2.getBytes(), "HmacSHA256"));
+        HmacSHA256.init(new SecretKeySpec(key2.getBytes(), "HmacSHA256"));
 
         System.out.println("0");
         try {
@@ -184,15 +207,15 @@ public class ZaloPayService {
 
     public Map<String, Object> statusOrderPayment(String app_trans_id) throws URISyntaxException, IOException {
 //        String app_trans_id = "210608_2553_1623145380738";  // Input your app_trans_id
-        String data = ZaloPayConfig.app_id +"|"+ app_trans_id  +"|"+ ZaloPayConfig.key1; // appid|app_trans_id|key1
-        String mac = HMACUtil.HMacHexStringEncode(HMACUtil.HMACSHA256, ZaloPayConfig.key1, data);
+        String data = app_id +"|"+ app_trans_id  +"|"+ key1; // appid|app_trans_id|key1
+        String mac = HMACUtil.HMacHexStringEncode(HMACUtil.HMACSHA256, key1, data);
 
         List<NameValuePair> params = new ArrayList<>();
-        params.add(new BasicNameValuePair("app_id", ZaloPayConfig.app_id));
+        params.add(new BasicNameValuePair("app_id", app_id));
         params.add(new BasicNameValuePair("app_trans_id", app_trans_id));
         params.add(new BasicNameValuePair("mac", mac));
 
-        URIBuilder uri = new URIBuilder(ZaloPayConfig.endpoint + "/query");
+        URIBuilder uri = new URIBuilder(endpoint + "/query");
         uri.addParameters(params);
 
         CloseableHttpClient client = HttpClients.createDefault();

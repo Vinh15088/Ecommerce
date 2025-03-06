@@ -1,18 +1,17 @@
 package com.LaptopWeb.service;
 
 import com.LaptopWeb.entity.Role;
-import com.LaptopWeb.entity.User;
-import com.LaptopWeb.exception.AppException;
 import com.LaptopWeb.repository.RoleRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class RoleService {
-    @Autowired
-    RoleRepository roleRopository;
+
+    private final RoleRepository roleRopository;
 
     public List<Role> getAll() {
         return roleRopository.findAll();

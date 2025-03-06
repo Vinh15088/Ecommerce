@@ -22,9 +22,9 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class AuthenticationService {
 
     private static final Logger log = LoggerFactory.getLogger(AuthenticationService.class);
@@ -69,33 +70,16 @@ public class AuthenticationService {
     @Value("${outbound.identity.facebook.redirect-uri}")
     private String FACEBOOK_REDIRECT_URI;
 
-
     private String GRANT_TYPE = "authorization_code";
 
-
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    UserService userService;
-
-    @Autowired
-    PasswordEncoder passwordEncoder;
-
-    @Autowired
-    InvalidatedTokenRepository invalidatedTokenRepository;
-
-    @Autowired
-    OutboundIdentityClientGoogle outboundIdentityClientGoogle;
-
-    @Autowired
-    OutboundUserGoogleClient outboundUserGoogleClient;
-
-    @Autowired
-    OutboundIdentityClientFacebook outboundIdentityClientFacebook;
-
-    @Autowired
-    OutboundUserFacebookClient outboundUserFacebookClient;
+    private final UserRepository userRepository;
+    private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
+    private final InvalidatedTokenRepository invalidatedTokenRepository;
+    private final OutboundIdentityClientGoogle outboundIdentityClientGoogle;
+    private final OutboundUserGoogleClient outboundUserGoogleClient;
+    private final OutboundIdentityClientFacebook outboundIdentityClientFacebook;
+    private final OutboundUserFacebookClient outboundUserFacebookClient;
 
 
     public AuthenticationResponse authenticationResponse(LoginRequest request) {
@@ -262,7 +246,9 @@ public class AuthenticationService {
 
         // get jwt id and expiration time of old token
         var jit = signJWT.getJWTClaimsSet().getJWTID();
-        var expiryTime = signJWT.getJWTClaimsSet().getExpirationTime();
+//        var expiryTime = signJWT.getJWTClaimsSet().getExpirationTime();
+        var expiryTime = new Date(signJWT.getJWTClaimsSet().getIssueTime().toInstant()
+                .plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS).toEpochMilli());
 
         // store old token in the repo
         InvalidatedToken invalidatedToken = InvalidatedToken.builder()
@@ -275,12 +261,7 @@ public class AuthenticationService {
         // extract username from the token claims
         String username = signJWT.getJWTClaimsSet().getSubject();
 
-        // find user with username
-        User user = userRepository.findByUsername(username).orElseThrow(() ->
-                new AppException(ErrorApp.USERNAME_INVALID));
-
-
-        if(user == null) throw new AppException(ErrorApp.USER_NOTFOUND);
+        User user = userService.getByUsername(username);
 
         // create a new token for user
         var tokenNew = generateToken(user);

@@ -4,9 +4,8 @@ import com.LaptopWeb.dto.request.BrandRequest;
 import com.LaptopWeb.entity.Brand;
 import com.LaptopWeb.exception.AppException;
 import com.LaptopWeb.exception.ErrorApp;
-import com.LaptopWeb.mapper.BrandMapper;
 import com.LaptopWeb.repository.BrandRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,19 +17,11 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class BrandService {
 
-    @Autowired
-    private BrandRepository brandRepository;
-
-    @Autowired
-    private AwsS3Service awsS3Service;
-
-//    @Autowired
-//    private AwsService awsService;
-
-    @Autowired
-    private BrandMapper brandMapper;
+    private final BrandRepository brandRepository;
+    private final AwsS3Service awsS3Service;
 
     @PreAuthorize("hasRole('ADMIN')")
     public Brand createBrand(BrandRequest request, MultipartFile logo) throws Exception {

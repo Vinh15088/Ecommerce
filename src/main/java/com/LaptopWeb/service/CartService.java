@@ -1,37 +1,28 @@
 package com.LaptopWeb.service;
 
 import com.LaptopWeb.dto.request.CartItemRequest;
-import com.LaptopWeb.dto.request.CartRequest;
 import com.LaptopWeb.entity.Cart;
 import com.LaptopWeb.entity.CartItem;
 import com.LaptopWeb.entity.Product;
 import com.LaptopWeb.entity.User;
 import com.LaptopWeb.exception.AppException;
 import com.LaptopWeb.exception.ErrorApp;
-import com.LaptopWeb.mapper.CartItemMapper;
-import com.LaptopWeb.mapper.CartMapper;
 import com.LaptopWeb.repository.CartItemRepository;
 import com.LaptopWeb.repository.CartRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class CartService {
-    @Autowired
-    private CartRepository cartRepository;
 
-    @Autowired
-    private ProductService productService;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private CartItemRepository cartItemRepository;
+    private final CartRepository cartRepository;
+    private final ProductService productService;
+    private final UserService userService;
+    private final CartItemRepository cartItemRepository;
 
 
     public Cart addCartItem(CartItemRequest cartItemRequest, String username) {

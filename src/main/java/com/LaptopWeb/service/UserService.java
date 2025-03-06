@@ -10,7 +10,7 @@ import com.LaptopWeb.exception.AppException;
 import com.LaptopWeb.exception.ErrorApp;
 import com.LaptopWeb.mapper.UserMapper;
 import com.LaptopWeb.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,22 +26,14 @@ import java.util.List;
 
 @Service
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class UserService {
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private UserMapper userMapper;
-
-    @Autowired
-    private RoleService roleService;
-
-    @Autowired
-    private EmailService emailService;
+    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final RoleService roleService;
+    private final EmailService emailService;
 
     public User createUser(CreateUserRequest request) throws Exception{
         // Kiểm tra tên đăng nhập và email trước khi tiếp tục

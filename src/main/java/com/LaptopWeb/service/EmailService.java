@@ -3,7 +3,7 @@ package com.LaptopWeb.service;
 import com.LaptopWeb.entity.EmailDetails;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.SimpleMailMessage;
@@ -14,9 +14,10 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 
 @Service
+@RequiredArgsConstructor
 public class EmailService {
-    @Autowired
-    private JavaMailSender javaMailSender;
+
+    private final JavaMailSender javaMailSender;
 
     @Value("${spring.mail.username}")
     private String sender;

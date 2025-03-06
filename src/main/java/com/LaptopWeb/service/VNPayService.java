@@ -8,10 +8,10 @@ import com.LaptopWeb.exception.AppException;
 import com.LaptopWeb.exception.ErrorApp;
 import com.amazonaws.services.amplify.model.BadRequestException;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import net.minidev.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
@@ -25,11 +25,12 @@ import java.util.*;
 import java.util.TimeZone;
 
 @Service
+@RequiredArgsConstructor
 public class VNPayService {
 
     private static final Logger log = LoggerFactory.getLogger(VNPayService.class);
-    @Autowired
-    private OrderService orderService;
+
+    private final OrderService orderService;
 
     public VNPayResponse paymentOrder(String orderCode){
 

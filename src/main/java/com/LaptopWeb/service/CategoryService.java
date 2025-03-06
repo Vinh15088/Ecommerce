@@ -7,7 +7,7 @@ import com.LaptopWeb.exception.AppException;
 import com.LaptopWeb.exception.ErrorApp;
 import com.LaptopWeb.mapper.CategoryMapper;
 import com.LaptopWeb.repository.CategoryRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,13 +19,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class CategoryService {
 
-    @Autowired
-    private CategoryRepository categoryRepository;
-
-    @Autowired
-    private CategoryMapper categoryMapper;
+    private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
 
     @PreAuthorize("hasRole('ADMIN')")
     public Category createCategory(CategoryRequest request) {
